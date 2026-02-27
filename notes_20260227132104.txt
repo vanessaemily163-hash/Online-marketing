@@ -1,0 +1,229 @@
+02.27 13:19
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ad-Dekho Pro Marketing</title>
+    <style>
+        :root { --blue: #1a73e8; --gold: #fbbc04; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); }
+        .screen { display: none; padding-bottom: 30px; }
+        .active { display: block; }
+        .header { background: var(--blue); color: white; padding: 15px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+        .card { background: white; border-radius: 12px; padding: 20px; margin: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
+        .menu-item { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; border: 1px solid #eee; font-weight: bold; }
+        .btn { border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 15px; }
+        .btn-blue { background: var(--blue); color: white; }
+        .btn-red { background: #d93025; color: white; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .task-card { background: white; border-radius: 12px; margin: 15px; overflow: hidden; border: 1px solid #eee; }
+        .task-img { width: 100%; height: 180px; object-fit: cover; }
+        #bankerPanel { position: fixed; inset: 0; background: white; z-index: 2000; display: none; padding: 20px; overflow-y: auto; }
+        .ref-box { background: #f0f7ff; padding: 15px; border: 2px dashed var(--blue); border-radius: 10px; font-size: 20px; font-weight: bold; color: var(--blue); margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <div id="authPage" class="screen active">
+        <div style="padding: 40px 20px; text-align: center;">
+            <h1 style="color: var(--blue);">Ad-Dekho Online</h1>
+            <div class="card">
+                <div style="display: flex; margin-bottom: 20px; border-bottom: 2px solid #eee;">
+                    <div id="tL" style="flex:1; padding:15px; cursor:pointer; border-bottom: 3px solid var(--blue);" onclick="toggleAuth('L')">Login</div>
+                    <div id="tR" style="flex:1; padding:15px; cursor:pointer;" onclick="toggleAuth('R')">Register</div>
+                </div>
+                <div id="loginF">
+                    <input type="text" id="lU" placeholder="Enter Username">
+                    <input type="password" id="lP" placeholder="Enter Password">
+                    <button class="btn btn-blue" onclick="doLogin()">Login Now</button>
+                </div>
+                <div id="regF" style="display: none;">
+                    <input type="text" id="rU" placeholder="Choose Username">
+                    <input type="password" id="rP" placeholder="Create Password">
+                    <button class="btn btn-blue" onclick="doRegister()">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mainApp" style="display: none;">
+        <div class="header">
+            <button onclick="showPage('homePage', 'Dashboard')" id="backBtn" style="background:none; border:1px solid white; color:white; border-radius:5px; padding:5px 10px;">← Back</button>
+            <span id="headerTitle">Dashboard</span>
+            <button id="adminBtn" style="display:none; background:red; color:white; border:none; padding:5px 10px; border-radius:5px;" onclick="showBanker()">BANKER</button>
+        </div>
+
+        <div id="homePage" class="screen">
+            <div class="card" style="background: linear-gradient(135deg, #1a73e8, #0d47a1); color: white; text-align: center; padding: 30px;">
+                <p style="margin:0; opacity:0.9;">Total Balance</p>
+                <h1 id="userBal" style="margin: 10px 0; font-size: 36px;">0.00 USDT</h1>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item" onclick="showPage('taskPage', 'Order Tasks')">🛍️<br>Tasks</div>
+                <div class="menu-item" onclick="showPage('invitePage', 'Invite')"><br>Referral</div>
+                <div class="menu-item" onclick="showPage('depositPage', 'Deposit')"><br>Deposit</div>
+                <div class="menu-item" onclick="showPage('withdrawPage', 'Withdraw')"><br>Withdraw</div>
+                <div class="menu-item" onclick="showPage('supportPage', 'Support')">✈️<br>Telegram</div>
+                <div class="menu-item" onclick="showPage('passPage', 'Security')"><br>Password</div>
+            </div>
+            <div style="padding: 0 15px;"><button class="btn" style="background:#ddd" onclick="location.reload()">Sign Out</button></div>
+        </div>
+
+        <div id="invitePage" class="screen">
+            <div class="card" style="text-align: center;">
+                <h3>Invite Your Friends</h3>
+                <p>Use your code to build your team.</p>
+                <div id="refShow" class="ref-box">---</div>
+                <button class="btn btn-blue" onclick="alert('Code Copied!')">Copy Referral Code</button>
+            </div>
+        </div>
+
+        <div id="taskPage" class="screen">
+            <div class="card" style="text-align: center;">Daily Tasks: <b id="taskCount" style="color:var(--blue)">0/25</b></div>
+            <div id="taskList"></div>
+        </div>
+
+        <div id="bankerPanel">
+            <h2 style="color:red; border-bottom: 2px solid #eee; padding-bottom: 10px;">System Controller</h2>
+            <div class="card">
+                <h4>1. Set Bonuses (USDT)</h4>
+                <label>Welcome Bonus:</label>
+                <input type="number" id="setBonus" placeholder="e.g. 50">
+                <label>Per Task Profit:</label>
+                <input type="number" id="setProfit" placeholder="e.g. 5">
+                <button class="btn btn-blue" onclick="saveSettings()">Apply Settings</button>
+            </div>
+            <div class="card">
+                <h4>2. Manual Recharge</h4>
+                <input type="text" id="targetU" placeholder="Username">
+                <input type="number" id="targetAmt" placeholder="Amount">
+                <button class="btn btn-blue" onclick="rechargeUser()">Send Money</button>
+            </div>
+            <div class="card">
+                <h4>3. Registered Users</h4>
+                <button class="btn btn-blue" onclick="viewUsers()">Refresh List</button>
+                <div id="dbView" style="margin-top:10px; font-size:11px; white-space:pre-wrap; background:#f4f4f4; padding:10px; border-radius:5px;"></div>
+            </div>
+            <button class="btn btn-red" onclick="document.getElementById('bankerPanel').style.display='none'">Exit Banker</button>
+        </div>
+
+        <div id="supportPage" class="screen"><div class="card" style="text-align: center;"><h3>Telegram</h3><button class="btn btn-blue" onclick="window.open('https://t.me/customer_care_service03')">Chat with Admin</button></div></div>
+        <div id="passPage" class="screen"><div class="card"><h3>Security</h3><input type="password" id="oldP" placeholder="Old Password"><input type="password" id="newP" placeholder="New Password"><button class="btn btn-blue" onclick="changePass()">Update</button></div></div>
+        <div id="depositPage" class="screen"><div class="card"><h3>USDT Address</h3><input type="text" value="TPoLd9WDtuabvcNB27jjBUUKP9irWQeRpz" readonly><button class="btn btn-blue" onclick="alert('Copied')">Copy Address</button></div></div>
+        <div id="withdrawPage" class="screen"><div class="card"><h3>Withdraw</h3><input type="number" placeholder="Amount"><button class="btn btn-blue">Submit Request</button></div></div>
+    </div>
+
+    <script>
+        let currentUser = "";
+        // Database version set to V7 to avoid conflicts
+        let data = JSON.parse(localStorage.getItem('om_v7') || '{"users":{}, "settings":{"bonus":0, "profit":5}}');
+
+        function toggleAuth(t) {
+            document.getElementById('loginF').style.display = t=='L'?'block':'none';
+            document.getElementById('regF').style.display = t=='R'?'block':'none';
+            document.getElementById('tL').style.borderBottom = t=='L'?'3px solid var(--blue)':'none';
+            document.getElementById('tR').style.borderBottom = t=='R'?'3px solid var(--blue)':'none';
+        }
+
+        function doRegister() {
+            let u = document.getElementById('rU').value, p = document.getElementById('rP').value;
+            if(!u || !p) return alert("Fill all fields");
+            if(data.users[u]) return alert("Username exists!");
+            
+            data.users[u] = { 
+                pass: p, 
+                bal: parseFloat(data.settings.bonus), 
+                tasks: 0, 
+                code: u.toUpperCase() + "786" 
+            };
+            save();
+            alert("Registered! Your Welcome Bonus: " + data.settings.bonus + " USDT"); toggleAuth('L');
+        }
+
+        function doLogin() {
+            let u = document.getElementById('lU').value, p = document.getElementById('lP').value;
+            if(u === 'admin' && p === '1234') { currentUser = 'admin'; start(); }
+            else if(data.users[u] && data.users[u].pass === p) { currentUser = u; start(); }
+            else { alert("Wrong Username or Password"); }
+        }
+
+        function start() {
+            document.getElementById('authPage').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('adminBtn').style.display = (currentUser === 'admin') ? 'block' : 'none';
+            showPage('homePage', 'Dashboard');
+            updateUI();
+        }
+
+        function updateUI() {
+            if(currentUser === 'admin') {
+                document.getElementById('userBal').innerText = "ADMIN MODE";
+                document.getElementById('refShow').innerText = "ADMIN-MASTER";
+            } else {
+                let u = data.users[currentUser];
+                document.getElementById('userBal').innerText = u.bal.toFixed(2) + " USDT";
+                document.getElementById('refShow').innerText = u.code;
+                document.getElementById('taskCount').innerText = u.tasks + "/25";
+            }
+        }
+
+        function showPage(id, title) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('headerTitle').innerText = title;
+            document.getElementById('backBtn').style.visibility = (id==='homePage')?'hidden':'visible';
+            if(id === 'taskPage') renderTasks();
+        }
+
+        function renderTasks() {
+            let list = document.getElementById('taskList');
+            list.innerHTML = "";
+            for(let i=1; i<=25; i++) {
+                list.innerHTML += `<div class="task-card">
+                    <img src="https://picsum.photos/seed/ad${i}/600/350" class="task-img">
+                    <div style="padding:15px; display:flex; justify-content:space-between; align-items:center;">
+                        <span><b>Order #${i}</b><br><small style="color:green;">+${data.settings.profit} USDT</small></span>
+                        <button class="btn btn-blue" style="width:auto; margin:0; padding:5px 15px;" onclick="completeTask()">Grab Order</button>
+                    </div>
+                </div>`;
+            }
+        }
+
+        function completeTask() {
+            if(currentUser==='admin') return alert("Admin can't perform tasks");
+            let u = data.users[currentUser];
+            if(u.tasks >= 25) return alert("Today's Limit reached!");
+            u.bal += parseFloat(data.settings.profit);
+            u.tasks += 1;
+            save(); updateUI();
+            alert("Task Grabbed Successfully!");
+        }
+
+        function saveSettings() {
+            data.settings.bonus = document.getElementById('setBonus').value || 0;
+            data.settings.profit = document.getElementById('setProfit').value || 5;
+            save(); alert("Site Control Updated!");
+        }
+
+        function rechargeUser() {
+            let u = document.getElementById('targetU').value, a = parseFloat(document.getElementById('targetAmt').value);
+            if(data.users[u]) { data.users[u].bal += a; save(); alert("Recharge Success!"); updateUI(); }
+            else { alert("User Not Found!"); }
+        }
+
+        function viewUsers() {
+            let txt = "--- ALL USERS ---\n";
+            for(let u in data.users) {
+                txt += `${u} | Pass: ${data.users[u].pass} | Bal: ${data.users[u].bal.toFixed(2)} | Code: ${data.users[u].code}\n`;
+            }
+            document.getElementById('dbView').innerText = txt || "Database Empty.";
+        }
+
+        function save() { localStorage.setItem('om_v7', JSON.stringify(data)); }
+        function showBanker() { document.getElementById('bankerPanel').style.display = 'block'; }
+    </script>
+</body>
+</html>
+
